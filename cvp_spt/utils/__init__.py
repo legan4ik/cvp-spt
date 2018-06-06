@@ -3,6 +3,7 @@ import yaml
 import requests
 import re
 import sys, traceback
+import itertools
 
 
 class salt_remote:
@@ -58,6 +59,20 @@ def get_active_nodes(test=None):
     else:
         nodes = local_salt_client.cmd('*', 'test.ping')
     return nodes
+
+
+def get_pairs():
+    result = {}
+    #import pdb;pdb.set_trace()
+    if os.environ['NODES']:
+        nodes = os.environ['NODES'].split(',')
+        if len(nodes) %2 != 0:
+            nodes.pop(1)
+        pairs = zip(*[iter(nodes)]*2)
+
+    for pair in pairs:
+        result[pair[0]+'<>'+pair[1]] = pair
+    return result
 
 
 def get_configuration():
