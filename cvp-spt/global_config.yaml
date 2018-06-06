@@ -1,0 +1,26 @@
+---
+# MANDATORY: Credentials for Salt Master
+# SALT_URL should consist of url and port.
+# For example: http://10.0.0.1:6969
+# 6969 - default Salt Master port to listen
+# Can be found on cfg* node using
+# "salt-call pillar.get _param:salt_master_host"
+# and "salt-call pillar.get _param:salt_master_port"
+# or "salt-call pillar.get _param:jenkins_salt_api_url"
+# SALT_USERNAME by default: salt
+# It can be verified with "salt-call shadow.info salt"
+# SALT_PASSWORD you can find on cfg* node using
+# "salt-call pillar.get _param:salt_api_password"
+# or "grep -r salt_api_password /srv/salt/reclass/classes"
+SALT_URL: <salt_url>
+SALT_USERNAME: <salt_usr>
+SALT_PASSWORD: <salt_pwd>
+
+# How many seconds to wait for salt-minion to respond
+salt_timeout: 1
+
+# List of nodes (full fqdn) to skip in ALL tests
+# Use as env variable as
+# export skipped_nodes=mtr01.local,log02.local
+# TEMPORARY: please do not comment this setting.
+skipped_nodes: [""]
