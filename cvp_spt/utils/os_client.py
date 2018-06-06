@@ -275,7 +275,6 @@ class OSCliActions(object):
             ]
         sg_name = "secgroup-{}".format(random.randrange(100, 999))
         sg_desc = sg_name + " description"
-        import pdb;pdb.set_trace()
         secgroup = self.os_clients.compute.security_groups.create(
             sg_name, sg_desc)
         for ruleset in rulesets:

@@ -36,7 +36,6 @@ def test_vm2vm ():
     
     if not flavor_id:
         openstack_clients.compute.flavors.create('spt-test',1536,1,3,0)
-    import pdb;pdb.set_trace()
     sec_group = os_actions.create_sec_group()
     keypair = openstack_clients.compute.keypairs.create('test-{}'.format(random.randrange(100, 999)))
     net1 = os_actions.create_network_resources()
