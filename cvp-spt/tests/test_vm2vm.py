@@ -2,12 +2,13 @@
 import os
 import random
 import time
+import pytest
 from cvp-test import utils
 from utils import ssh
 from utils import os_client
 
 
-def test_vm2vm ():
+def test_vm2vm:
     openstack_clients = os_client.OfficialClientManager(
             username=os.environ['OS_USERNAME'],
             password=os.environ['OS_PASSWORD'],
