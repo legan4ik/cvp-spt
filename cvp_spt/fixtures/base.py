@@ -1,5 +1,5 @@
 import pytest
-import cvp-spt.utils as utils
+import cvp_spt.utils as utils
 
 
 @pytest.fixture(scope='session')

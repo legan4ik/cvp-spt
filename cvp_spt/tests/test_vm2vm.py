@@ -3,12 +3,11 @@ import os
 import random
 import time
 import pytest
-from cvp-test import utils
-from utils import ssh
-from utils import os_client
+from cvp_spt.utils import os_client
+from cvp_spt.utils import ssh
 
 
-def test_vm2vm:
+def test_vm2vm ():
     openstack_clients = os_client.OfficialClientManager(
             username=os.environ['OS_USERNAME'],
             password=os.environ['OS_PASSWORD'],
@@ -18,12 +17,11 @@ def test_vm2vm:
             domain='Default',
         )
     
-    os_actions = client.OSCliActions(openstack_clients)
+    os_actions = os_client.OSCliActions(openstack_clients)
     
     zone = 'nova'
     
-    hosts = [service.host for service in openstack_clients.compute.services.list() ii
-    f service.zone != 'internal']
+    hosts = [service.host for service in openstack_clients.compute.services.list() if service.zone != 'internal']
     
     host1 = hosts[0]
     host2 = hosts[1]
@@ -38,6 +36,7 @@ def test_vm2vm:
     
     if not flavor_id:
         openstack_clients.compute.flavors.create('spt-test',1536,1,3,0)
+    import pdb;pdb.set_trace()
     sec_group = os_actions.create_sec_group()
     keypair = openstack_clients.compute.keypairs.create('test-{}'.format(random.randrange(100, 999)))
     net1 = os_actions.create_network_resources()
@@ -123,10 +122,10 @@ def test_vm2vm:
     openstack_clients.compute.servers.delete(vm3)
     openstack_clients.compute.servers.delete(vm4)
     
-    openstack_clients.compute.floating_ips.delete(floating_ip1)
-    openstack_clients.compute.floating_ips.delete(floating_ip2)
-    openstack_clients.compute.floating_ips.delete(floating_ip3)
-    openstack_clients.compute.floating_ips.delete(floating_ip4)
+    openstack_clients.compute.floating_ips.delete(floating_ip1.ip)
+    openstack_clients.compute.floating_ips.delete(floating_ip2.ip)
+    openstack_clients.compute.floating_ips.delete(floating_ip3.ip)
+    openstack_clients.compute.floating_ips.delete(floating_ip4.ip)
     
     
     openstack_clients.network.remove_interface_router(router['id'], {'subnet_id': subnet1})
