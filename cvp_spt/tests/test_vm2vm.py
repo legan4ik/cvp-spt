@@ -7,12 +7,19 @@ from cvp_spt.utils import os_client
 from cvp_spt.utils import ssh
 
 
-def test_vm2vm ():
+def test_vm2vm (local_salt_client):
+    nodes_info = local_salt_client.cmd(
+        'keystone:server', 'pillar.get',
+        ['keystone:server'],
+        expr_form='pillar')
+    keystone = nodes_info[nodes_info.keys()[0]]
+    url = 'http://{0}:{1}/v2.0'.format(keystone['bind']['private_address'],
+                                       keystone['bind']['private_port'])
     openstack_clients = os_client.OfficialClientManager(
-            username=os.environ['OS_USERNAME'],
-            password=os.environ['OS_PASSWORD'],
-            tenant_name=os.environ['OS_TENANT_NAME'],
-            auth_url=os.environ['OS_AUTH_URL'],
+            username=keystone['admin_name'],
+            password=keystone['admin_password'],
+            tenant_name=keystone['admin_tenant'],
+            auth_url=url,
             cert=False,
             domain='Default',
         )
@@ -121,10 +128,10 @@ def test_vm2vm ():
     openstack_clients.compute.servers.delete(vm3)
     openstack_clients.compute.servers.delete(vm4)
     
-    openstack_clients.compute.floating_ips.delete(floating_ip1.ip)
-    openstack_clients.compute.floating_ips.delete(floating_ip2.ip)
-    openstack_clients.compute.floating_ips.delete(floating_ip3.ip)
-    openstack_clients.compute.floating_ips.delete(floating_ip4.ip)
+    openstack_clients.compute.floating_ips.delete(floating_ip1.id)
+    openstack_clients.compute.floating_ips.delete(floating_ip2.id)
+    openstack_clients.compute.floating_ips.delete(floating_ip3.id)
+    openstack_clients.compute.floating_ips.delete(floating_ip4.id)
     
     
     openstack_clients.network.remove_interface_router(router['id'], {'subnet_id': subnet1})
