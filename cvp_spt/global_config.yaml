@@ -12,9 +12,9 @@
 # SALT_PASSWORD you can find on cfg* node using
 # "salt-call pillar.get _param:salt_api_password"
 # or "grep -r salt_api_password /srv/salt/reclass/classes"
-SALT_URL: http://10.100.0.15:6969
-SALT_USERNAME: salt
-SALT_PASSWORD: eaRgU4dgxpT5S1t0VRJdUaTBVICpis68
+SALT_URL: <URL>
+SALT_USERNAME: <USERNAME>
+SALT_PASSWORD: <PASSWORD>
 
 # How many seconds to wait for salt-minion to respond
 salt_timeout: 1

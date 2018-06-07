@@ -127,3 +127,12 @@ class SSHTransport(object):
         sftp = self._get_sftp_connection()
         sftp.get(source_path, destination_path)
         sftp.close()
+
+
+class prepare_iperf(object):
+
+    def __init__(self,fip,user='ubuntu',password='password', private_key=None):
+        transport = SSHTransport(fip, user, password, private_key)
+        transport.exec_command('sudo /bin/bash -c "echo \'91.189.88.161        archive.ubuntu.com\' >> /etc/hosts"')
+        transport.exec_command('sudo apt-get update; sudo apt-get install -y iperf')
+        transport.exec_command('nohup iperf -s > file 2>&1 &') 

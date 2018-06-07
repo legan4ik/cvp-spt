@@ -49,10 +49,11 @@ def os_resources(openstack_clients):
         print "No image ID. Exiting"
         exit()
     
-    os_resource['flavor_id'] = str([flavor.id for flavor in openstack_clients.compute.flavors.list() if flavor.name == 'spt-test'][0])
-    
+    os_resource['flavor_id'] = [flavor.id for flavor in openstack_clients.compute.flavors.list() if flavor.name == 'spt-test']
     if not os_resource['flavor_id']:
-        openstack_clients.compute.flavors.create('spt-test',1536,1,3,0)
+        os_resource['flavor_id'] = openstack_clients.compute.flavors.create('spt-test',1536,1,3,0).id
+    else:
+        os_resource['flavor_id'] = str(os_resource['flavor_id'][0])
 
     os_resource['sec_group'] = os_actions.create_sec_group()
     os_resource['keypair'] = openstack_clients.compute.keypairs.create('test-{}'.format(random.randrange(100, 999)))
@@ -70,7 +71,7 @@ def os_resources(openstack_clients):
     openstack_clients.network.add_interface_router(os_resource['router']['id'],{'subnet_id': os_resource['subnet2']['id']})
     #return os_resource
     yield os_resource
-
+    time.sleep(5)
     openstack_clients.network.remove_interface_router(os_resource['router']['id'], {'subnet_id': os_resource['subnet1']})
     openstack_clients.network.remove_interface_router(os_resource['router']['id'], {'subnet_id': os_resource['subnet2']['id']})
     openstack_clients.network.remove_gateway_router(os_resource['router']['id'])
@@ -86,4 +87,4 @@ def os_resources(openstack_clients):
     openstack_clients.compute.security_groups.delete(os_resource['sec_group'].id)
     openstack_clients.compute.keypairs.delete(os_resource['keypair'].name)
     
-    openstack_clients.compute.flavors.delete('spt-test')
+    openstack_clients.compute.flavors.delete(os_resource['flavor_id'])
