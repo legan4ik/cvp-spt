@@ -67,10 +67,8 @@ def get_pairs():
                 'I@nova:compute',
                 'test.ping',
                 expr_form='compound')
-        result = [node.split('.')[0] for node in nodes.keys() if node not in skipped_nodes]
-    else:
-        result = cmp_hosts.split(',')
-    return compile_pairs(result)
+        cmp_hosts = [node.split('.')[0] for node in nodes.keys() if node not in skipped_nodes]
+    return compile_pairs(cmp_hosts)
 
 
 def get_hw_pairs():
@@ -85,12 +83,10 @@ def get_hw_pairs():
                 'I@salt:control or I@nova:compute',
                 'test.ping',
                 expr_form='compound')
-        result = [node for node in nodes.keys() if node not in skipped_nodes]
-    else:
-        result = hw_nodes.split(',')
-    print local_salt_client.cmd(expr_form='compound', tgt="L@"+','.join(result),
+        hw_nodes = [node for node in nodes.keys() if node not in skipped_nodes]
+    print local_salt_client.cmd(expr_form='compound', tgt="L@"+','.join(hw_nodes),
                                 fun='cmd.run', param=['apt-get install -y iperf'])
-    return compile_pairs(result)
+    return compile_pairs(hw_nodes)
 
 def get_configuration():
     """function returns configuration for environment
