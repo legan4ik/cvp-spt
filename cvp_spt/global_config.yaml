@@ -24,3 +24,4 @@ salt_timeout: 1
 # export skipped_nodes=mtr01.local,log02.local
 # TEMPORARY: please do not comment this setting.
 skipped_nodes: [""]
+networks: {"public": "10.101.0.0/24"}

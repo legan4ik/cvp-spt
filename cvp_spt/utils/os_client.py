@@ -1,6 +1,5 @@
 from cinderclient import client as cinder_client
 from glanceclient import client as glance_client
-from heatclient import client as heat_client
 from keystoneauth1 import identity as keystone_identity
 from keystoneauth1 import session as keystone_session
 from keystoneclient import client as keystone_client
@@ -273,8 +272,8 @@ class OSCliActions(object):
                     'cidr': '0.0.0.0/0',
                 }
             ]
-        sg_name = "secgroup-{}".format(random.randrange(100, 999))
-        sg_desc = sg_name + " description"
+        sg_name = "spt-test-secgroup-{}".format(random.randrange(100, 999))
+        sg_desc = sg_name + " SPT"
         secgroup = self.os_clients.compute.security_groups.create(
             sg_name, sg_desc)
         for ruleset in rulesets:
@@ -310,7 +309,7 @@ class OSCliActions(object):
         if sec_groups:
             kwargs['security_groups'] = sec_groups
         server = os_conn.compute.servers.create(
-            "server-{}".format(random.randrange(100, 999)),
+            "spt-test-server-{}".format(random.randrange(100, 999)),
             image, flavor, nics=[{"net-id": net["id"]}],
             availability_zone=availability_zone, key_name=keypair, **kwargs)
         #if wait_timeout:
@@ -323,7 +322,7 @@ class OSCliActions(object):
         return server
 
     def create_network(self, tenant_id):
-        net_name = "net-{}".format(random.randrange(100, 999))
+        net_name = "spt-test-net-{}".format(random.randrange(100, 999))
         net_body = {
             'network': {
                 'name': net_name,
@@ -336,7 +335,7 @@ class OSCliActions(object):
         #self.os_clients.network.delete_network(net['id'])
 
     def create_subnet(self, net, tenant_id, cidr=None):
-        subnet_name = "subnet-{}".format(random.randrange(100, 999))
+        subnet_name = "spt-test-subnet-{}".format(random.randrange(100, 999))
         subnet_body = {
             'subnet': {
                 "name": subnet_name,
@@ -352,7 +351,7 @@ class OSCliActions(object):
         #self.os_clients.network.delete_subnet(subnet['id'])
 
     def create_router(self, ext_net, tenant_id):
-        name = 'router-{}'.format(random.randrange(100, 999))
+        name = 'spt-test-router-{}'.format(random.randrange(100, 999))
         router_body = {
             'router': {
                 'name': name,

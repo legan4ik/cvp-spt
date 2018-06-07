@@ -4,6 +4,7 @@ import requests
 import re
 import sys, traceback
 import itertools
+import helpers
 
 
 class salt_remote:
@@ -41,39 +42,38 @@ def init_salt_client():
     return local
 
 
-def get_active_nodes(test=None):
-    config = get_configuration()
-    local_salt_client = init_salt_client()
-
-    skipped_nodes = config.get('skipped_nodes') or []
-    if test:
-        testname = test.split('.')[0]
-        if 'skipped_nodes' in config.get(testname).keys():
-            skipped_nodes += config.get(testname)['skipped_nodes'] or []
-    if skipped_nodes != ['']:
-        print "\nNotice: {0} nodes will be skipped".format(skipped_nodes)
-        nodes = local_salt_client.cmd(
-            '* and not ' + list_to_target_string(skipped_nodes, 'and not'),
-            'test.ping',
-            expr_form='compound')
-    else:
-        nodes = local_salt_client.cmd('*', 'test.ping')
-    return nodes
-
-
-def get_pairs():
+def compile_pairs (nodes):
     result = {}
-    #import pdb;pdb.set_trace()
-    if os.environ['NODES']:
-        nodes = os.environ['NODES'].split(',')
-        if len(nodes) %2 != 0:
-            nodes.pop(1)
-        pairs = zip(*[iter(nodes)]*2)
-
+    if len(nodes) %2 != 0:
+        nodes.pop(1)
+    pairs = zip(*[iter(nodes)]*2)
     for pair in pairs:
         result[pair[0]+'<>'+pair[1]] = pair
     return result
 
+
+def get_pairs():
+    # TODO: rename varibale
+    # TODO: add autocollect
+    if os.environ['NODES']:
+        nodes = os.environ['NODES'].split(',')
+    return compile_pairs(nodes)
+
+
+def get_hw_pairs():
+    config = get_configuration()
+    local_salt_client = init_salt_client()
+    # TODO: add env variable HW_NODES
+    skipped_nodes = config.get('skipped_nodes') or []
+    print "\nNotice: {0} nodes will be skipped".format(skipped_nodes)
+    nodes = local_salt_client.cmd(
+            'I@salt:control or I@nova:compute',
+            'test.ping',
+            expr_form='compound')
+    result = [node for node in nodes.keys() if node not in skipped_nodes]
+    #print local_salt_client.cmd(expr_form='compound', tgt="L@"+','.join(result),
+    #                            fun='cmd.run', param=['apt-get install -y iperf'])
+    return compile_pairs(result)
 
 def get_configuration():
     """function returns configuration for environment
