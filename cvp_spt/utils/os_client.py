@@ -18,7 +18,6 @@ class OfficialClientManager(object):
 
     CINDERCLIENT_VERSION = 3
     GLANCECLIENT_VERSION = 2
-    HEATCLIENT_VERSION = 1
     KEYSTONECLIENT_VERSION = 2, 0
     NEUTRONCLIENT_VERSION = 2
     NOVACLIENT_VERSION = 2
@@ -204,6 +203,7 @@ class OSCliActions(object):
     def get_admin_tenant(self):
         return self.os_clients.auth.tenants.find(name="admin")
 
+    # TODO: refactor
     def get_cirros_image(self):
         images_list = list(self.os_clients.image.images.list(name='TestVM'))
         if images_list:
@@ -216,9 +216,6 @@ class OSCliActions(object):
             with file_cache.get_file(settings.CIRROS_QCOW2_URL) as f:
                 self.os_clients.image.images.upload(image.id, f)
         return image
-
-    def get_micro_flavor(self):
-        return self.os_clients.compute.flavors.list(sort_key="memory_mb")[0]
 
     def get_internal_network(self):
         networks = [
@@ -312,6 +309,7 @@ class OSCliActions(object):
             "spt-test-server-{}".format(random.randrange(100, 999)),
             image, flavor, nics=[{"net-id": net["id"]}],
             availability_zone=availability_zone, key_name=keypair, **kwargs)
+        # TODO
         #if wait_timeout:
         #    self.wait(
         #        lambda: os_conn.compute.servers.get(server).status == "ACTIVE",

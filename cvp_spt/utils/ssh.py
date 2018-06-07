@@ -1,7 +1,7 @@
 import cStringIO
 import logging
 import select
-
+from cvp_spt import utils
 import paramiko
 
 
@@ -133,6 +133,8 @@ class prepare_iperf(object):
 
     def __init__(self,fip,user='ubuntu',password='password', private_key=None):
         transport = SSHTransport(fip, user, password, private_key)
-        transport.exec_command('sudo /bin/bash -c "echo \'91.189.88.161        archive.ubuntu.com\' >> /etc/hosts"')
+        config = utils.get_configuration()
+        preparation_cmd = config.get('iperf_prep_string') or ['']
+        transport.exec_command(preparation_cmd)
         transport.exec_command('sudo apt-get update; sudo apt-get install -y iperf')
         transport.exec_command('nohup iperf -s > file 2>&1 &') 

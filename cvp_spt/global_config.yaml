@@ -22,6 +22,10 @@ salt_timeout: 1
 # List of nodes (full fqdn) to skip in ALL tests
 # Use as env variable as
 # export skipped_nodes=mtr01.local,log02.local
-# TEMPORARY: please do not comment this setting.
-skipped_nodes: [""]
-networks: {"public": "10.101.0.0/24"}
+image_name: "Ubuntu"
+skipped_nodes: []
+networks: ["10.101.0.0/24"]
+HW_NODES: []
+CMP_HOSTS: []
+nova_timeout: 30
+iperf_prep_string: "sudo /bin/bash -c 'echo \"91.189.88.161        archive.ubuntu.com\" >> /etc/hosts'"

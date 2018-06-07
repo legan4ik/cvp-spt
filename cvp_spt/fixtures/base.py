@@ -8,6 +8,8 @@ from cvp_spt.utils import os_client
 def local_salt_client():
     return utils.init_salt_client()
 
+# TODO: fix
+# should not be executed on any test run
 nodes = utils.get_pairs()
 hw_nodes = utils.get_hw_pairs()
 
@@ -41,7 +43,9 @@ def openstack_clients(local_salt_client):
 def os_resources(openstack_clients):
     os_actions = os_client.OSCliActions(openstack_clients)
     os_resource = {}
-    os_resource['image_id'] = str([image.id for image in openstack_clients.image.images.list(name='Ubuntu')][0])
+    config = utils.get_configuration()
+    image_name = config.get('image_name') or ['Ubuntu']
+    os_resource['image_id'] = str([image.id for image in openstack_clients.image.images.list(name=image_name)][0])
     
     if not os_resource['image_id']:
         print "No image ID. Exiting"
@@ -49,7 +53,7 @@ def os_resources(openstack_clients):
     
     os_resource['flavor_id'] = [flavor.id for flavor in openstack_clients.compute.flavors.list() if flavor.name == 'spt-test']
     if not os_resource['flavor_id']:
-        os_resource['flavor_id'] = openstack_clients.compute.flavors.create('spt-test',1536,1,3,0).id
+        os_resource['flavor_id'] = os_actions.create_flavor('spt-test',1536,1,3).id
     else:
         os_resource['flavor_id'] = str(os_resource['flavor_id'][0])
 
@@ -68,14 +72,14 @@ def os_resources(openstack_clients):
     openstack_clients.network.add_interface_router(os_resource['router']['id'],{'subnet_id': os_resource['subnet1']})
     openstack_clients.network.add_interface_router(os_resource['router']['id'],{'subnet_id': os_resource['subnet2']['id']})
     yield os_resource
-    time.sleep(5)
+    #time.sleep(5)
     openstack_clients.network.remove_interface_router(os_resource['router']['id'], {'subnet_id': os_resource['subnet1']})
     openstack_clients.network.remove_interface_router(os_resource['router']['id'], {'subnet_id': os_resource['subnet2']['id']})
     openstack_clients.network.remove_gateway_router(os_resource['router']['id'])
     time.sleep(5)
     openstack_clients.network.delete_router(os_resource['router']['id'])
     
-    time.sleep(10)
+    time.sleep(5)
     
     #openstack_clients.network.delete_subnet(subnet1['id'])
     openstack_clients.network.delete_network(os_resource['net1']['id'])

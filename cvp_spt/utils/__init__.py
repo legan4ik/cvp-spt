@@ -5,6 +5,7 @@ import re
 import sys, traceback
 import itertools
 import helpers
+from cvp_spt.utils import os_client
 
 
 class salt_remote:
@@ -53,31 +54,48 @@ def compile_pairs (nodes):
 
 
 def get_pairs():
-    # TODO: rename varibale
-    # TODO: add autocollect
-    if os.environ['NODES']:
-        nodes = os.environ['NODES'].split(',')
-    return compile_pairs(nodes)
+    # TODO
+    # maybe collect cmp from nova service-list
+    config = get_configuration()
+    local_salt_client = init_salt_client()
+    cmp_hosts = config.get('CMP_HOSTS') or []
+    skipped_nodes = config.get('skipped_nodes') or []
+    if skipped_nodes:
+        print "Notice: {0} nodes will be skipped for vm2vm test".format(skipped_nodes)
+    if not cmp_hosts:
+        nodes = local_salt_client.cmd(
+                'I@nova:compute',
+                'test.ping',
+                expr_form='compound')
+        result = [node.split('.')[0] for node in nodes.keys() if node not in skipped_nodes]
+    else:
+        result = cmp_hosts.split(',')
+    return compile_pairs(result)
 
 
 def get_hw_pairs():
     config = get_configuration()
     local_salt_client = init_salt_client()
-    # TODO: add env variable HW_NODES
+    hw_nodes = config.get('HW_NODES') or []
     skipped_nodes = config.get('skipped_nodes') or []
-    print "\nNotice: {0} nodes will be skipped".format(skipped_nodes)
-    nodes = local_salt_client.cmd(
-            'I@salt:control or I@nova:compute',
-            'test.ping',
-            expr_form='compound')
-    result = [node for node in nodes.keys() if node not in skipped_nodes]
-    #print local_salt_client.cmd(expr_form='compound', tgt="L@"+','.join(result),
-    #                            fun='cmd.run', param=['apt-get install -y iperf'])
+    if skipped_nodes:
+        print "Notice: {0} nodes will be skipped for hw2hw test".format(skipped_nodes)
+    if not hw_nodes:
+        nodes = local_salt_client.cmd(
+                'I@salt:control or I@nova:compute',
+                'test.ping',
+                expr_form='compound')
+        result = [node for node in nodes.keys() if node not in skipped_nodes]
+    else:
+        result = hw_nodes.split(',')
+    print local_salt_client.cmd(expr_form='compound', tgt="L@"+','.join(result),
+                                fun='cmd.run', param=['apt-get install -y iperf'])
     return compile_pairs(result)
 
 def get_configuration():
     """function returns configuration for environment
     and for test if it's specified"""
+
     global_config_file = os.path.join(
         os.path.dirname(os.path.abspath(__file__)), "../global_config.yaml")
     with open(global_config_file, 'r') as file:

@@ -23,12 +23,12 @@ def test_hw2hw (local_salt_client,hw_pair):
             if 'inet' not in nodes[hw_pair[0]][interf].keys():
                 continue
             ip = nodes[hw_pair[0]][interf]['inet'][0]['address']
-            if (IPAddress(ip) in IPNetwork(nets[net])) and (nodes[hw_pair[0]][interf]['inet'][0]['broadcast']):
+            if (IPAddress(ip) in IPNetwork(net)) and (nodes[hw_pair[0]][interf]['inet'][0]['broadcast']):
                 for interf2 in nodes[hw_pair[1]]:
                     if 'inet' not in nodes[hw_pair[1]][interf2].keys():
                         continue
                     ip2 = nodes[hw_pair[1]][interf2]['inet'][0]['address']
-                    if (IPAddress(ip2) in IPNetwork(nets[net])) and (nodes[hw_pair[1]][interf2]['inet'][0]['broadcast']):
+                    if (IPAddress(ip2) in IPNetwork(net)) and (nodes[hw_pair[1]][interf2]['inet'][0]['broadcast']):
                         print "Will IPERF between {0} and {1}".format(ip,ip2)
                         try:
                             helpp.start_iperf_between_hosts(global_results, hw_pair[0], hw_pair[1],
