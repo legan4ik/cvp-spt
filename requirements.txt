@@ -7,4 +7,4 @@ python-neutronclient>=5.1.0  # Apache-2.0
 python-novaclient==7.1.0
 PyYAML>=3.12  # MIT
 requests>=2.10.0,!=2.12.2 # Apache-2.0
-texttable
+texttable==1.2.0

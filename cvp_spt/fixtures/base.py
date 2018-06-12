@@ -45,7 +45,7 @@ def os_resources(openstack_clients):
     os_resource = {}
     config = utils.get_configuration()
     image_name = config.get('image_name') or ['Ubuntu']
-    os_resource['image_id'] = str([image.id for image in openstack_clients.image.images.list(name=image_name)][0])
+    os_resource['image_id'] = str([image.id for image in openstack_clients.image.images.list(filters={'name': image_name})][0])
     
     if not os_resource['image_id']:
         print "No image ID. Exiting"

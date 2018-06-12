@@ -16,7 +16,7 @@ def create_image():
     subprocess.call('rm /tmp/image_mk_framework.download'.split())
 
 
-def test_speed_glance(create_image, openstack_clients):
+def test_speed_glance(create_image, openstack_clients, record_property):
     """
     Simplified Performance Tests Download / upload lance
     1. Step download image
@@ -44,6 +44,8 @@ def test_speed_glance(create_image, openstack_clients):
     speed_download = 9000 / (end_time - start_time)
 
     openstack_clients.image.images.delete(image.id)
+    record_property("Upload", speed_upload)
+    record_property("Download", speed_download)
 
     print "++++++++++++++++++++++++++++++++++++++++"
     print 'upload - {} Mb/s'.format(speed_upload)

@@ -11,6 +11,8 @@ from cvp_spt.utils import os_client
 class salt_remote:
     def cmd(self, tgt, fun, param=None, expr_form=None, tgt_type=None):
         config = get_configuration()
+        url = config['SALT_URL']
+        proxies = {"http": None, "https": None}
         headers = {'Accept': 'application/json'}
         login_payload = {'username': config['SALT_USERNAME'],
                          'password': config['SALT_PASSWORD'], 'eauth': 'pam'}
@@ -21,13 +23,14 @@ class salt_remote:
             accept_key_payload['arg'] = param
 
         try:
-            login_request = requests.post(os.path.join(config['SALT_URL'],
-                                                       'login'),
-                                          headers=headers, data=login_payload)
+            login_request = requests.post(os.path.join(url, 'login'),
+                                          headers=headers, data=login_payload,
+                                          proxies=proxies)
             if login_request.ok:
-                request = requests.post(config['SALT_URL'], headers=headers,
+                request = requests.post(url, headers=headers,
                                         data=accept_key_payload,
-                                        cookies=login_request.cookies)
+                                        cookies=login_request.cookies,
+                                        proxies=proxies)
                 return request.json()['return'][0]
         except Exception:
             print "\033[91m\nConnection to SaltMaster " \
